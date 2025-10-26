@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GGUF Fundamentals - GGUF Model Engineering | HintsOn.com</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo-container">
+            <img src="../assets/images/logo.svg" alt="HintsOn Logo" class="logo">
+            <span class="brand-name">HintsOn</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="../index.html#home">Home</a></li>
+                <li><a href="../index.html#course">Course</a></li>
+                <li><a href="../index.html#tutorials">Tutorials</a></li>
+                <li><a href="../index.html#docs">Documentation</a></li>
+                <li><a href="../about.html">About</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="module-hero">
+            <div class="module-header">
+                <span class="module-number">Module 01</span>
+                <h1>GGUF Fundamentals</h1>
+                <p class="module-description">Master the foundations of GGUF format and model quantization</p>
+                <div class="module-meta">
+                    <span class="duration"><i class="icon-clock"></i> 4 hours</span>
+                    <span class="difficulty"><i class="icon-level"></i> Beginner</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="module-content">
+            <div class="lesson-grid">
+                <div class="lesson-card">
+                    <span class="lesson-number">01</span>
+                    <h2>Understanding GGUF Format</h2>
+                    <div class="lesson-content">
+                        <h3>What is GGUF?</h3>
+                        <p>GGUF (GPT-Generated Unified Format) is a file format designed for efficient inference of large language models on consumer hardware. It's the evolution of GGML, offering improved features and compatibility.</p>
+                        
+                        <h3>Key Benefits</h3>
+                        <ul>
+                            <li>Efficient memory usage</li>
+                            <li>Faster inference speeds</li>
+                            <li>Reduced model size</li>
+                            <li>Cross-platform compatibility</li>
+                        </ul>
+
+                        <h3>Comparing GGUF with Other Formats</h3>
+                        <div class="comparison-table">
+                            <table>
+                                <tr>
+                                    <th>Feature</th>
+                                    <th>GGUF</th>
+                                    <th>SafeTensors</th>
+                                    <th>PyTorch</th>
+                                </tr>
+                                <tr>
+                                    <td>Memory Efficiency</td>
+                                    <td>High</td>
+                                    <td>Medium</td>
+                                    <td>Low</td>
+                                </tr>
+                                <tr>
+                                    <td>Inference Speed</td>
+                                    <td>Fast</td>
+                                    <td>Medium</td>
+                                    <td>Slow</td>
+                                </tr>
+                                <tr>
+                                    <td>File Size</td>
+                                    <td>Small</td>
+                                    <td>Large</td>
+                                    <td>Large</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lesson-card">
+                    <span class="lesson-number">02</span>
+                    <h2>Quantization Fundamentals</h2>
+                    <div class="lesson-content">
+                        <h3>What is Quantization?</h3>
+                        <p>Quantization is the process of reducing the precision of model weights to decrease memory usage and increase inference speed, while maintaining model quality.</p>
+
+                        <h3>Types of Quantization</h3>
+                        <ul>
+                            <li>
+                                <strong>Q4_K_M</strong>
+                                <p>4-bit quantization with K-means clustering and medium precision</p>
+                            </li>
+                            <li>
+                                <strong>Q5_K_M</strong>
+                                <p>5-bit quantization offering better quality with slightly larger size</p>
+                            </li>
+                            <li>
+                                <strong>Q8_0</strong>
+                                <p>8-bit quantization for highest quality with larger size</p>
+                            </li>
+                        </ul>
+
+                        <div class="info-box">
+                            <h4>Precision vs Size Trade-off</h4>
+                            <p>Higher precision (Q8_0) = Better quality + Larger size</p>
+                            <p>Lower precision (Q4_K_M) = Smaller size + Slightly lower quality</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lesson-card">
+                    <span class="lesson-number">03</span>
+                    <h2>Setting Up llama.cpp</h2>
+                    <div class="lesson-content">
+                        <h3>Installation Steps</h3>
+                        <div class="code-block">
+                            <pre><code># Clone the repository
+git clone https://github.com/ggerganov/llama.cpp
+cd llama.cpp
+
+# Build for CPU
+make
+
+# Build for CUDA (if you have an NVIDIA GPU)
+make LLAMA_CUBLAS=1</code></pre>
+                        </div>
+
+                        <h3>System Requirements</h3>
+                        <ul>
+                            <li>CPU: Modern x86 processor with AVX2 support</li>
+                            <li>RAM: Minimum 8GB (16GB+ recommended)</li>
+                            <li>GPU: Optional, NVIDIA GPU for CUDA acceleration</li>
+                            <li>Storage: 10GB+ free space</li>
+                        </ul>
+
+                        <div class="warning-box">
+                            <h4>Important Note</h4>
+                            <p>Make sure to have the following prerequisites installed:</p>
+                            <ul>
+                                <li>CMake (3.12 or higher)</li>
+                                <li>Git</li>
+                                <li>C++ compiler (gcc/clang/MSVC)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lesson-card">
+                    <span class="lesson-number">04</span>
+                    <h2>Your First Model Conversion</h2>
+                    <div class="lesson-content">
+                        <h3>Step-by-Step Guide</h3>
+                        <ol>
+                            <li>
+                                <h4>Download a Model</h4>
+                                <p>Get a base model from Hugging Face (e.g., TinyLlama)</p>
+                                <div class="code-block">
+                                    <pre><code>git lfs install
+git clone https://huggingface.co/TinyLlama/TinyLlama-1.1B-base</code></pre>
+                                </div>
+                            </li>
+                            <li>
+                                <h4>Convert to GGUF</h4>
+                                <p>Use the conversion script</p>
+                                <div class="code-block">
+                                    <pre><code>python convert.py models/TinyLlama-1.1B-base/ \
+    --outfile models/tinyllama-1.1b-base.gguf</code></pre>
+                                </div>
+                            </li>
+                            <li>
+                                <h4>Quantize the Model</h4>
+                                <p>Create a quantized version</p>
+                                <div class="code-block">
+                                    <pre><code>./quantize models/tinyllama-1.1b-base.gguf \
+    models/tinyllama-1.1b-base-q4_k_m.gguf q4_k_m</code></pre>
+                                </div>
+                            </li>
+                            <li>
+                                <h4>Test the Model</h4>
+                                <p>Run inference</p>
+                                <div class="code-block">
+                                    <pre><code>./main -m models/tinyllama-1.1b-base-q4_k_m.gguf \
+    -p "Hello, world!"</code></pre>
+                                </div>
+                            </li>
+                        </ol>
+
+                        <div class="success-box">
+                            <h4>Congratulations!</h4>
+                            <p>You've successfully converted and run your first GGUF model!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="next-steps">
+            <h2>Ready to Continue?</h2>
+            <p>Move on to the next module to learn about custom model finetuning</p>
+            <a href="finetuning.html" class="btn btn-primary">Next Module: Custom Finetuning →</a>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <img src="../assets/images/logo.svg" alt="HintsOn Logo" class="footer-logo">
+                <p>Empowering developers with AI knowledge and tools</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-section">
+                    <h4>Course</h4>
+                    <ul>
+                        <li><a href="../index.html#course">Learning Path</a></li>
+                        <li><a href="fundamentals.html">Fundamentals</a></li>
+                        <li><a href="finetuning.html">Finetuning</a></li>
+                        <li><a href="production.html">Production</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="../docs/getting-started.html">Getting Started</a></li>
+                        <li><a href="../docs/examples.html">Examples</a></li>
+                        <li><a href="../docs/troubleshooting.html">Troubleshooting</a></li>
+                        <li><a href="../docs/reference.html">API Reference</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <ul>
+                        <li><a href="https://github.com/hintson">GitHub</a></li>
+                        <li><a href="https://twitter.com/hintson">Twitter</a></li>
+                        <li><a href="https://www.linkedin.com/company/hintson">LinkedIn</a></li>
+                        <li><a href="https://www.hintson.com">Website</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 HintsOn.com. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../assets/js/main.js"></script>
+</body>
+</html>

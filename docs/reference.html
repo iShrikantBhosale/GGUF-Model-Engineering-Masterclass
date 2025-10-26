@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Reference - GGUF Model Engineering | HintsOn.com</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo-container">
+            <img src="../assets/images/logo.svg" alt="HintsOn Logo" class="logo">
+            <span class="brand-name">HintsOn</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="../index.html#home">Home</a></li>
+                <li><a href="../index.html#course">Course</a></li>
+                <li><a href="../index.html#tutorials">Tutorials</a></li>
+                <li><a href="../index.html#docs">Documentation</a></li>
+                <li><a href="../about.html">About</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="docs-hero">
+            <div class="docs-header">
+                <h1>API Reference</h1>
+                <p class="docs-description">Complete documentation for GGUF model integration</p>
+            </div>
+        </section>
+
+        <section class="docs-content">
+            <div class="docs-grid">
+                <div class="docs-nav">
+                    <h3>Contents</h3>
+                    <ul>
+                        <li><a href="#core-api">Core API</a></li>
+                        <li><a href="#model-loading">Model Loading</a></li>
+                        <li><a href="#inference">Inference</a></li>
+                        <li><a href="#parameters">Parameters</a></li>
+                        <li><a href="#utilities">Utilities</a></li>
+                    </ul>
+                </div>
+
+                <div class="docs-main">
+                    <section id="core-api">
+                        <h2>Core API</h2>
+                        <div class="api-section">
+                            <h3>Model Initialization</h3>
+                            <div class="code-block">
+                                <pre><code>from llama_cpp import Llama
+
+model = Llama(
+    model_path="path/to/model.gguf",
+    n_ctx=2048,      # Context window
+    n_threads=4,     # CPU threads
+    n_gpu_layers=0   # GPU layers
+)</code></pre>
+                            </div>
+
+                            <table class="api-table">
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                                <tr>
+                                    <td>model_path</td>
+                                    <td>str</td>
+                                    <td>Path to GGUF model file</td>
+                                </tr>
+                                <tr>
+                                    <td>n_ctx</td>
+                                    <td>int</td>
+                                    <td>Context window size</td>
+                                </tr>
+                                <tr>
+                                    <td>n_threads</td>
+                                    <td>int</td>
+                                    <td>Number of CPU threads</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section id="model-loading">
+                        <h2>Model Loading</h2>
+                        <div class="api-section">
+                            <h3>Loading Methods</h3>
+                            <div class="code-block">
+                                <pre><code># Standard loading
+model = Llama.from_pretrained(
+    "model_name",
+    gpu_layers=0
+)
+
+# Quantized loading
+model = Llama.from_quantized(
+    "model_path",
+    quantization="q4_k_m"
+)</code></pre>
+                            </div>
+
+                            <div class="info-box">
+                                <h4>Loading Tips</h4>
+                                <ul>
+                                    <li>Use appropriate quantization for your hardware</li>
+                                    <li>Monitor memory usage during loading</li>
+                                    <li>Consider lazy loading for large models</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="inference">
+                        <h2>Inference</h2>
+                        <div class="api-section">
+                            <h3>Text Generation</h3>
+                            <div class="code-block">
+                                <pre><code># Basic generation
+output = model.generate(
+    "Your prompt here",
+    max_tokens=100,
+    temperature=0.7,
+    top_p=0.95
+)
+
+# Streaming generation
+for token in model.generate_stream(
+    "Your prompt here",
+    max_tokens=100
+):
+    print(token, end="", flush=True)</code></pre>
+                            </div>
+
+                            <div class="warning-box">
+                                <h4>Important Notes</h4>
+                                <ul>
+                                    <li>Monitor token count to avoid context overflow</li>
+                                    <li>Handle stream interruptions gracefully</li>
+                                    <li>Consider batch processing for multiple requests</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="parameters">
+                        <h2>Parameters</h2>
+                        <div class="api-section">
+                            <h3>Generation Parameters</h3>
+                            <table class="api-table">
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Range</th>
+                                    <th>Description</th>
+                                </tr>
+                                <tr>
+                                    <td>temperature</td>
+                                    <td>0.0 - 2.0</td>
+                                    <td>Controls randomness</td>
+                                </tr>
+                                <tr>
+                                    <td>top_p</td>
+                                    <td>0.0 - 1.0</td>
+                                    <td>Nucleus sampling</td>
+                                </tr>
+                                <tr>
+                                    <td>top_k</td>
+                                    <td>1 - 100</td>
+                                    <td>Top-K sampling</td>
+                                </tr>
+                            </table>
+
+                            <div class="code-block">
+                                <pre><code># Example with all parameters
+output = model.generate(
+    prompt="Hello",
+    max_tokens=100,
+    temperature=0.7,
+    top_p=0.95,
+    top_k=40,
+    repeat_penalty=1.1,
+    presence_penalty=0.0,
+    frequency_penalty=0.0
+)</code></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="utilities">
+                        <h2>Utilities</h2>
+                        <div class="api-section">
+                            <h3>Helper Functions</h3>
+                            <div class="code-block">
+                                <pre><code># Token counting
+n_tokens = model.token_count("Your text here")
+
+# Context management
+model.reset_context()
+model.clear_cache()
+
+# Model info
+print(model.model_info())
+print(model.get_memory_usage())</code></pre>
+                            </div>
+
+                            <div class="success-box">
+                                <h4>Best Practices</h4>
+                                <ul>
+                                    <li>Regular cache clearing</li>
+                                    <li>Memory monitoring</li>
+                                    <li>Context reuse when possible</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <img src="../assets/images/logo.svg" alt="HintsOn Logo" class="footer-logo">
+                <p>Empowering developers with AI knowledge and tools</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-section">
+                    <h4>Course</h4>
+                    <ul>
+                        <li><a href="../index.html#course">Learning Path</a></li>
+                        <li><a href="../modules/fundamentals.html">Fundamentals</a></li>
+                        <li><a href="../modules/finetuning.html">Finetuning</a></li>
+                        <li><a href="../modules/production.html">Production</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="getting-started.html">Getting Started</a></li>
+                        <li><a href="examples.html">Examples</a></li>
+                        <li><a href="troubleshooting.html">Troubleshooting</a></li>
+                        <li><a href="reference.html">API Reference</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <ul>
+                        <li><a href="https://github.com/hintson">GitHub</a></li>
+                        <li><a href="https://twitter.com/hintson">Twitter</a></li>
+                        <li><a href="https://www.linkedin.com/company/hintson">LinkedIn</a></li>
+                        <li><a href="https://www.hintson.com">Website</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 HintsOn.com. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../assets/js/main.js"></script>
+</body>
+</html>

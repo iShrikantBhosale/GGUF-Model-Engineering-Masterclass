@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production & Advanced Techniques - GGUF Model Engineering | HintsOn.com</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo-container">
+            <img src="../assets/images/logo.svg" alt="HintsOn Logo" class="logo">
+            <span class="brand-name">HintsOn</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="../index.html#home">Home</a></li>
+                <li><a href="../index.html#course">Course</a></li>
+                <li><a href="../index.html#tutorials">Tutorials</a></li>
+                <li><a href="../index.html#docs">Documentation</a></li>
+                <li><a href="../about.html">About</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="module-hero">
+            <div class="module-header">
+                <span class="module-number">Module 04</span>
+                <h1>Production & Advanced Techniques</h1>
+                <p class="module-description">Deploy and optimize GGUF models for production environments</p>
+                <div class="module-meta">
+                    <span class="duration"><i class="icon-clock"></i> 5 hours</span>
+                    <span class="difficulty"><i class="icon-level"></i> Advanced</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="module-content">
+            <div class="lesson-grid">
+                <div class="lesson-card">
+                    <span class="lesson-number">01</span>
+                    <h2>Performance Optimization</h2>
+                    <div class="lesson-content">
+                        <h3>CPU Optimization</h3>
+                        <div class="code-block">
+                            <pre><code># Compile with optimizations
+cmake -B build -DLLAMA_BLAS=ON -DLLAMA_AVX2=ON
+cmake --build build --config Release
+
+# Run with optimized parameters
+./main \
+    -m model.gguf \
+    -ngl 0 \
+    -t 8 \
+    -b 512 \
+    -c 2048</code></pre>
+                        </div>
+                        
+                        <h3>GPU Acceleration</h3>
+                        <div class="code-block">
+                            <pre><code># Build with CUDA support
+cmake -B build -DLLAMA_CUBLAS=ON
+cmake --build build --config Release
+
+# Run with GPU layers
+./main \
+    -m model.gguf \
+    -ngl 35 \    # Number of GPU layers
+    -t 1 \       # CPU threads
+    -b 512 \     # Batch size
+    -c 2048      # Context size</code></pre>
+                        </div>
+
+                        <div class="info-box">
+                            <h4>Performance Tips</h4>
+                            <ul>
+                                <li>Use batch processing for multiple requests</li>
+                                <li>Optimize context window size</li>
+                                <li>Balance CPU/GPU workload</li>
+                                <li>Monitor memory usage</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lesson-card">
+                    <span class="lesson-number">02</span>
+                    <h2>Deployment Strategies</h2>
+                    <div class="lesson-content">
+                        <h3>Docker Deployment</h3>
+                        <div class="code-block">
+                            <pre><code># Dockerfile
+FROM ubuntu:22.04
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    git \
+    python3-pip
+
+# Clone and build llama.cpp
+RUN git clone https://github.com/ggerganov/llama.cpp
+WORKDIR /llama.cpp
+RUN make
+
+# Copy model and start script
+COPY model.gguf /models/
+COPY start.sh /
+
+CMD ["/start.sh"]</code></pre>
+                        </div>
+
+                        <h3>Kubernetes Configuration</h3>
+                        <div class="code-block">
+                            <pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llama-server
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: llama-server
+  template:
+    metadata:
+      labels:
+        app: llama-server
+    spec:
+      containers:
+      - name: llama-server
+        image: llama-server:latest
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+        volumeMounts:
+        - name: model-storage
+          mountPath: /models</code></pre>
+                        </div>
+
+                        <div class="warning-box">
+                            <h4>Deployment Considerations</h4>
+                            <ul>
+                                <li>Resource allocation</li>
+                                <li>Load balancing</li>
+                                <li>High availability</li>
+                                <li>Monitoring setup</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lesson-card">
+                    <span class="lesson-number">03</span>
+                    <h2>API Integration</h2>
+                    <div class="lesson-content">
+                        <h3>FastAPI Server</h3>
+                        <div class="code-block">
+                            <pre><code>from fastapi import FastAPI, BackgroundTasks
+from pydantic import BaseModel
+import llama_cpp
+
+app = FastAPI()
+model = llama_cpp.Llama(
+    model_path="model.gguf",
+    n_ctx=2048,
+    n_threads=8
+)
+
+class InferenceRequest(BaseModel):
+    prompt: str
+    max_tokens: int = 512
+    temperature: float = 0.7
+
+@app.post("/generate")
+async def generate(
+    request: InferenceRequest,
+    background_tasks: BackgroundTasks
+):
+    output = model.generate(
+        request.prompt,
+        max_tokens=request.max_tokens,
+        temperature=request.temperature
+    )
+    return {"response": output}</code></pre>
+                        </div>
+
+                        <h3>Client Integration</h3>
+                        <div class="code-block">
+                            <pre><code>import requests
+
+def generate_text(prompt: str) -> str:
+    response = requests.post(
+        "http://localhost:8000/generate",
+        json={
+            "prompt": prompt,
+            "max_tokens": 512,
+            "temperature": 0.7
+        }
+    )
+    return response.json()["response"]</code></pre>
+                        </div>
+
+                        <div class="info-box">
+                            <h4>API Best Practices</h4>
+                            <ul>
+                                <li>Rate limiting</li>
+                                <li>Request validation</li>
+                                <li>Error handling</li>
+                                <li>Response caching</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lesson-card">
+                    <span class="lesson-number">04</span>
+                    <h2>Monitoring & Maintenance</h2>
+                    <div class="lesson-content">
+                        <h3>Prometheus Metrics</h3>
+                        <div class="code-block">
+                            <pre><code>from prometheus_client import Counter, Histogram
+
+# Define metrics
+inference_requests = Counter(
+    'llama_inference_requests_total',
+    'Total number of inference requests'
+)
+
+inference_latency = Histogram(
+    'llama_inference_latency_seconds',
+    'Inference request latency'
+)
+
+# Use in API
+@app.post("/generate")
+async def generate(request: InferenceRequest):
+    inference_requests.inc()
+    
+    with inference_latency.time():
+        output = model.generate(request.prompt)
+    
+    return {"response": output}</code></pre>
+                        </div>
+
+                        <h3>Grafana Dashboard</h3>
+                        <div class="code-block">
+                            <pre><code>{
+  "panels": [
+    {
+      "title": "Inference Requests",
+      "type": "graph",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "rate(llama_inference_requests_total[5m])",
+          "legendFormat": "requests/sec"
+        }
+      ]
+    },
+    {
+      "title": "Latency",
+      "type": "heatmap",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "rate(llama_inference_latency_seconds_bucket[5m])",
+          "legendFormat": "{{le}}"
+        }
+      ]
+    }
+  ]
+}</code></pre>
+                        </div>
+
+                        <div class="success-box">
+                            <h4>Monitoring Checklist</h4>
+                            <ul>
+                                <li>Resource utilization</li>
+                                <li>Request latency</li>
+                                <li>Error rates</li>
+                                <li>Model performance</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="next-steps">
+            <h2>Congratulations!</h2>
+            <p>You've completed the GGUF Model Engineering course!</p>
+            <div class="navigation-buttons">
+                <a href="alignment.html" class="btn btn-secondary">← Previous: Model Alignment</a>
+                <a href="../docs/reference.html" class="btn btn-primary">View API Reference →</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <img src="../assets/images/logo.svg" alt="HintsOn Logo" class="footer-logo">
+                <p>Empowering developers with AI knowledge and tools</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-section">
+                    <h4>Course</h4>
+                    <ul>
+                        <li><a href="../index.html#course">Learning Path</a></li>
+                        <li><a href="fundamentals.html">Fundamentals</a></li>
+                        <li><a href="finetuning.html">Finetuning</a></li>
+                        <li><a href="production.html">Production</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="../docs/getting-started.html">Getting Started</a></li>
+                        <li><a href="../docs/examples.html">Examples</a></li>
+                        <li><a href="../docs/troubleshooting.html">Troubleshooting</a></li>
+                        <li><a href="../docs/reference.html">API Reference</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <ul>
+                        <li><a href="https://github.com/hintson">GitHub</a></li>
+                        <li><a href="https://twitter.com/hintson">Twitter</a></li>
+                        <li><a href="https://www.linkedin.com/company/hintson">LinkedIn</a></li>
+                        <li><a href="https://www.hintson.com">Website</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 HintsOn.com. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../assets/js/main.js"></script>
+</body>
+</html>

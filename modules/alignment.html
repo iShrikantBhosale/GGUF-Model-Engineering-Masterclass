@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Alignment - GGUF Model Engineering | HintsOn.com</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo-container">
+            <img src="../assets/images/logo.svg" alt="HintsOn Logo" class="logo">
+            <span class="brand-name">HintsOn</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="../index.html#home">Home</a></li>
+                <li><a href="../index.html#course">Course</a></li>
+                <li><a href="../index.html#tutorials">Tutorials</a></li>
+                <li><a href="../index.html#docs">Documentation</a></li>
+                <li><a href="../about.html">About</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="module-hero">
+            <div class="module-header">
+                <span class="module-number">Module 03</span>
+                <h1>Model Alignment</h1>
+                <p class="module-description">Learn how to align model behavior with human preferences</p>
+                <div class="module-meta">
+                    <span class="duration"><i class="icon-clock"></i> 5 hours</span>
+                    <span class="difficulty"><i class="icon-level"></i> Advanced</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="module-content">
+            <div class="lesson-grid">
+                <div class="lesson-card">
+                    <span class="lesson-number">01</span>
+                    <h2>Understanding Model Alignment</h2>
+                    <div class="lesson-content">
+                        <h3>What is Model Alignment?</h3>
+                        <p>Model alignment refers to the process of making AI models behave in accordance with human values and preferences. This includes making models more helpful, honest, and safe.</p>
+                        
+                        <h3>Key Concepts</h3>
+                        <ul>
+                            <li>Value Learning</li>
+                            <li>Preference Learning</li>
+                            <li>Safety Constraints</li>
+                            <li>Ethical Considerations</li>
+                        </ul>
+
+                        <div class="info-box">
+                            <h4>Why Alignment Matters</h4>
+                            <ul>
+                                <li>Ensures model behaves ethically</li>
+                                <li>Reduces harmful outputs</li>
+                                <li>Improves user trust</li>
+                                <li>Creates more reliable systems</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lesson-card">
+                    <span class="lesson-number">02</span>
+                    <h2>Direct Preference Optimization (DPO)</h2>
+                    <div class="lesson-content">
+                        <h3>What is DPO?</h3>
+                        <p>DPO is a technique for training language models to follow human preferences without using reward modeling or reinforcement learning.</p>
+
+                        <h3>DPO Implementation</h3>
+                        <div class="code-block">
+                            <pre><code>from transformers import AutoModelForCausalLM
+from datasets import load_dataset
+from trl import DPOTrainer
+
+# Load base model
+model = AutoModelForCausalLM.from_pretrained("mistralai/Mistral-7B-v0.1")
+
+# Prepare preference data
+preferences = load_dataset("preference_dataset")
+
+# Initialize DPO trainer
+dpo_trainer = DPOTrainer(
+    model=model,
+    args=DPOConfig(
+        beta=0.1,
+        max_length=512,
+        max_prompt_length=128
+    ),
+    train_dataset=preferences
+)</code></pre>
+                        </div>
+
+                        <h3>Training Process</h3>
+                        <ol>
+                            <li>Collect human preference data</li>
+                            <li>Format preference pairs</li>
+                            <li>Train using DPO</li>
+                            <li>Evaluate alignment</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="lesson-card">
+                    <span class="lesson-number">03</span>
+                    <h2>Collecting Preference Data</h2>
+                    <div class="lesson-content">
+                        <h3>Data Collection Guidelines</h3>
+                        <div class="checklist">
+                            <label><input type="checkbox"> Define clear evaluation criteria</label>
+                            <label><input type="checkbox"> Create diverse scenarios</label>
+                            <label><input type="checkbox"> Include edge cases</label>
+                            <label><input type="checkbox"> Maintain consistency</label>
+                        </div>
+
+                        <h3>Example Preference Format</h3>
+                        <div class="code-block">
+                            <pre><code>{
+    "prompt": "How do I improve my programming skills?",
+    "response_1": "Just copy code from Stack Overflow",
+    "response_2": "Practice regularly, work on projects, and study fundamentals",
+    "choice": "response_2",
+    "reason": "Promotes genuine learning and skill development"
+}</code></pre>
+                        </div>
+
+                        <div class="warning-box">
+                            <h4>Common Pitfalls</h4>
+                            <ul>
+                                <li>Inconsistent preferences</li>
+                                <li>Biased data collection</li>
+                                <li>Insufficient diversity</li>
+                                <li>Poor documentation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lesson-card">
+                    <span class="lesson-number">04</span>
+                    <h2>Evaluating Alignment</h2>
+                    <div class="lesson-content">
+                        <h3>Evaluation Metrics</h3>
+                        <div class="comparison-table">
+                            <table>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Description</th>
+                                    <th>Target</th>
+                                </tr>
+                                <tr>
+                                    <td>Preference Agreement</td>
+                                    <td>Match with human choices</td>
+                                    <td>>90%</td>
+                                </tr>
+                                <tr>
+                                    <td>Safety Score</td>
+                                    <td>Harmful content avoidance</td>
+                                    <td>>95%</td>
+                                </tr>
+                                <tr>
+                                    <td>Task Success</td>
+                                    <td>Goal completion rate</td>
+                                    <td>>85%</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <h3>Testing Framework</h3>
+                        <div class="code-block">
+                            <pre><code>def evaluate_alignment(model, test_cases):
+    results = {
+        'preference_match': 0,
+        'safety_score': 0,
+        'task_success': 0
+    }
+    
+    for case in test_cases:
+        # Run evaluation
+        output = model.generate(case.prompt)
+        
+        # Check against criteria
+        results['preference_match'] += check_preference(
+            output, case.preferred
+        )
+        results['safety_score'] += check_safety(output)
+        results['task_success'] += check_completion(
+            output, case.goal
+        )
+    
+    return normalize_scores(results)</code></pre>
+                        </div>
+
+                        <div class="success-box">
+                            <h4>Best Practices</h4>
+                            <ul>
+                                <li>Regular evaluation cycles</li>
+                                <li>Diverse test cases</li>
+                                <li>Documentation of results</li>
+                                <li>Continuous improvement</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="next-steps">
+            <h2>Ready to Continue?</h2>
+            <p>Move on to the next module to learn about production deployment</p>
+            <div class="navigation-buttons">
+                <a href="finetuning.html" class="btn btn-secondary">← Previous: Finetuning</a>
+                <a href="production.html" class="btn btn-primary">Next: Production →</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <img src="../assets/images/logo.svg" alt="HintsOn Logo" class="footer-logo">
+                <p>Empowering developers with AI knowledge and tools</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-section">
+                    <h4>Course</h4>
+                    <ul>
+                        <li><a href="../index.html#course">Learning Path</a></li>
+                        <li><a href="fundamentals.html">Fundamentals</a></li>
+                        <li><a href="finetuning.html">Finetuning</a></li>
+                        <li><a href="production.html">Production</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="../docs/getting-started.html">Getting Started</a></li>
+                        <li><a href="../docs/examples.html">Examples</a></li>
+                        <li><a href="../docs/troubleshooting.html">Troubleshooting</a></li>
+                        <li><a href="../docs/reference.html">API Reference</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <ul>
+                        <li><a href="https://github.com/hintson">GitHub</a></li>
+                        <li><a href="https://twitter.com/hintson">Twitter</a></li>
+                        <li><a href="https://www.linkedin.com/company/hintson">LinkedIn</a></li>
+                        <li><a href="https://www.hintson.com">Website</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 HintsOn.com. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../assets/js/main.js"></script>
+</body>
+</html>
